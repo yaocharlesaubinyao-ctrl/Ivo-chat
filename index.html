@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ivo Chat">
+<title>Ivo Chat</title>
+<script>(function(){try{var c=document.createElement("canvas");c.width=c.height=180;var x=c.getContext("2d");x.fillStyle="#f08a24";x.fillRect(0,0,180,180);x.fillStyle="#2b1a05";x.font="800 92px system-ui,-apple-system,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText("IV",90,96);var l=document.createElement("link");l.rel="apple-touch-icon";l.href=c.toDataURL("image/png");document.head.appendChild(l)}catch(e){}})()</script>
+<style>
+:root{--bg:#f6f3ee;--card:#fff;--ink:#15221c;--mute:#667369;--line:#e2ddd3;--g:#0d5c3d;--o:#f08a24;--me:#f9c27f;--mei:#2b1a05;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1511;--card:#15231c;--ink:#e9f0eb;--mute:#93a69b;--line:#243a2e;--g:#4fc28e;--me:#c8741a;--mei:#fff}}
+:root[data-theme="dark"]{--bg:#0c1511;--card:#15231c;--ink:#e9f0eb;--mute:#93a69b;--line:#243a2e;--g:#4fc28e;--me:#c8741a;--mei:#fff}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+[hidden]{display:none!important}
+.scr{height:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding:20px 18px}
+h1{font-size:40px;line-height:1;margin:0 0 10px;letter-spacing:-.03em}
+h2{font-size:22px;margin:0}
+p{margin:0 0 14px;color:var(--mute)}
+input{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+input:focus,button:focus-visible{outline:2px solid var(--o);outline-offset:1px}
+button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:13px 18px;background:var(--g);color:#fff;cursor:pointer}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .pri{color:#0c1511}}
+:root[data-theme="dark"] .pri{color:#0c1511}
+button.sec{background:transparent;color:var(--g);padding:8px 10px}
+button.danger{background:transparent;color:#c0391b;border:1px solid var(--line);width:100%;margin-top:10px}
+button:disabled{opacity:.45}
+.grow{flex:1}
+.logo{width:76px;height:76px;border-radius:24px;background:var(--o);display:grid;place-items:center;font-size:38px;margin-bottom:22px;color:#2b1a05;font-weight:800}
+.logo.sm{width:56px;height:56px;border-radius:18px;font-size:26px;margin:0 0 14px;letter-spacing:.02em}
+.phone{display:flex;gap:8px;margin:8px 0 16px}.phone b{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-weight:600}
+.code{font-size:28px;letter-spacing:.4em;text-align:center}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;overflow:hidden}
+.av.big{width:96px;height:96px;font-size:36px;margin:20px auto 12px}
+.list{overflow-y:auto;flex:1;margin:0 -18px}
+.it{display:flex;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);cursor:pointer}
+.it .t{flex:1;min-width:0}.it .t b,.it .t span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .t span{color:var(--mute);font-size:14px}
+.it .m{text-align:right;font-size:12px;color:var(--mute)}
+.bd{display:inline-block;min-width:22px;background:var(--o);color:#2b1a05;border-radius:99px;padding:1px 7px;font-weight:700;margin-top:4px}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:8px 0}
+.b{max-width:80%;padding:8px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line);align-self:flex-start;word-break:break-word}
+.b.me{align-self:flex-end;background:var(--me);color:var(--mei);border-color:transparent}
+.b small{display:block;text-align:right;font-size:11px;opacity:.7;margin-top:2px}
+.b img{max-width:100%;border-radius:10px;display:block}
+.bar{display:flex;gap:8px;align-items:center;padding-top:8px}
+.bar input{border-radius:99px}.bar button{border-radius:99px;padding:12px 16px}
+.b audio{width:230px;max-width:100%;display:block}
+#start{width:100%;font-size:18px;padding:16px}
+.note{text-align:center;color:var(--mute);font-size:14px;padding:8px}
+.empty{color:var(--mute);text-align:center;margin-top:40px}
+</style>
+</head>
+<body>
+
+<section class="scr" id="s-welcome">
+<div class="grow"></div>
+<div class="logo">IV</div>
+<h1>Ivo Chat</h1>
+<p>Écris à tes proches en Côte d’Ivoire, simplement avec ton numéro.</p>
+<p id="dbwarn" style="color:#c0391b" hidden>Base de données non configurée.</p>
+<button class="pri" id="start">Commencer</button>
+<p style="margin:14px 0 0;font-size:13px">Version d’essai entre amis : tes messages sont partagés avec les testeurs invités.</p>
+</section>
+
+<section class="scr" id="s-phone" hidden>
+<button class="sec" data-go="welcome" style="align-self:flex-start">Retour</button>
+<h2 style="margin-top:12px">Ton numéro</h2>
+<p>Nous t’enverrons un code par SMS.</p>
+<div class="phone"><b>+225</b><input id="num" type="tel" inputmode="numeric" placeholder="07 00 00 00 00" maxlength="14" autocomplete="tel-national"></div>
+<button class="pri" id="toCode">Recevoir le code</button>
+</section>
+
+<section class="scr" id="s-code" hidden>
+<button class="sec" data-go="phone" style="align-self:flex-start">Retour</button>
+<h2 style="margin-top:12px">Entre le code</h2>
+<p id="codeInfo">Code envoyé par SMS.</p>
+<input id="code" class="code" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="one-time-code">
+<p style="margin:10px 0 16px;font-size:13px">Essai : le SMS est simulé, entre n’importe quels 6 chiffres.</p>
+<button class="pri" id="verify" disabled>Valider</button>
+<button class="sec" id="resend" disabled style="margin-top:8px"></button>
+</section>
+
+<section class="scr" id="s-profile" hidden>
+<div class="logo sm">IV</div>
+<h2>Ton profil</h2>
+<p>Ton prénom sera visible par tes contacts.</p>
+<div class="av big" id="pav" style="background:var(--g)">?</div>
+<input id="pname" placeholder="Prénom" maxlength="30" autocomplete="given-name" style="margin-bottom:16px">
+<button class="pri" id="saveP">Continuer</button>
+</section>
+
+<section class="scr" id="s-list" hidden>
+<div class="top"><h2 class="grow">Discussions</h2><button class="sec" data-go="settings">Réglages</button></div>
+<div class="list" id="list"></div>
+<p class="note" id="nolist"></p>
+</section>
+
+<section class="scr" id="s-chat" hidden>
+<div class="top"><button class="sec" data-go="list">Retour</button><div class="av" id="cav" style="width:38px;height:38px"></div><b class="grow" id="cname" style="cursor:pointer"></b></div>
+<div class="msgs" id="msgs"></div>
+<div class="note" id="cnote" hidden>Tu as bloqué ce contact.</div>
+<div class="bar" id="bar"><button class="sec" id="photoB" aria-label="Envoyer une photo" style="padding:10px">Photo</button><button class="sec" id="micB" aria-label="Message vocal" style="padding:10px">Vocal</button><input id="msg" placeholder="Écris un message" maxlength="1000" autocomplete="off"><button class="pri" id="send">Envoyer</button></div>
+<input type="file" id="file" accept="image/*" hidden>
+</section>
+
+<section class="scr" id="s-contact" hidden>
+<button class="sec" data-go="chat" style="align-self:flex-start">Retour</button>
+<div class="av big" id="kav"></div>
+<h2 id="kname" style="text-align:center"></h2>
+<p id="knum" style="text-align:center"></p>
+<button class="danger" id="block"></button>
+<button class="danger" id="report">Signaler</button>
+</section>
+
+<section class="scr" id="s-settings" hidden>
+<button class="sec" data-go="list" style="align-self:flex-start">Retour</button>
+<h2 style="margin:12px 0">Réglages</h2>
+<p>Modifier ton prénom</p>
+<input id="sname" maxlength="30" style="margin-bottom:12px">
+<button class="pri" id="saveS">Enregistrer</button>
+<button class="danger" id="del">Supprimer mon compte</button>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ====== À REMPLIR : colle ici la configuration de ton projet Firebase ======
+var FIREBASE_CONFIG={
+  apiKey:"AIzaSyB3ScQf4sA8l-x8o-hHazt9rF2GW7aYNzo",
+  authDomain:"ivo-chat-29255.firebaseapp.com",
+  projectId:"ivo-chat-29255",
+  storageBucket:"ivo-chat-29255.firebasestorage.app",
+  messagingSenderId:"365593521476",
+  appId:"1:365593521476:web:f09caa98e79a6c644c3b11"
+};
+// ==========================================================================
+</script>
+<script>
+(function(){
+var KS="ivochat-session",KB="ivochat-blocked",KN="ivochat-seen";
+var me=null,bl={},seen={},users={},msgs=[],db=null,cur="welcome",open=null,timer=null,digits="",synced=false;
+function ld(k,d){try{var r=localStorage.getItem(k);return r?JSON.parse(r):d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+me=ld(KS,null);bl=ld(KB,{});seen=ld(KN,{});
+function $(i){return document.getElementById(i)}
+function hm(t){return new Date(t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
+function fmt(p){return "+225 "+String(p).replace(/(\d{2})(?=\d)/g,"$1 ")}
+var COL=["#d9731c","#2f7a5a","#a3366b","#3b6ea5","#7a4fb0","#b0453a"];
+function col(p){var s=0;for(var i=0;i<p.length;i++)s+=p.charCodeAt(i);return COL[s%COL.length]}
+function nm(p){return users[p]&&users[p].name||fmt(p)}
+function av(el,p){el.style.background=col(p);el.textContent=nm(p).charAt(0).toUpperCase()}
+function show(id){document.querySelectorAll(".scr").forEach(function(e){e.hidden=e.id!=="s-"+id});cur=id}
+function conv(p){return msgs.filter(function(m){return m.from===p||m.to===p})}
+function unread(p){if(bl[p])return 0;return msgs.filter(function(m){return m.from===p&&m.ts>(seen[p]||0)}).length}
+function total(){var n=0;Object.keys(users).forEach(function(p){if(p!==me.phone)n+=unread(p)});document.title=n?"("+n+") Ivo Chat":"Ivo Chat"}
+function renderList(){
+ var L=$("list");L.textContent="";if(!me)return;
+ var ps=Object.keys(users).filter(function(p){return p!==me.phone});
+ function last(p){var c=conv(p);return c[c.length-1]}
+ ps.sort(function(a,b){var x=last(a),y=last(b);return (y?y.ts:0)-(x?x.ts:0)||nm(a).localeCompare(nm(b))});
+ ps.forEach(function(p){var l=last(p),h=unread(p);
+  var d=document.createElement("div");d.className="it";
+  var a=document.createElement("div");a.className="av";av(a,p);
+  var t=document.createElement("div");t.className="t";var b=document.createElement("b");b.textContent=nm(p);var s=document.createElement("span");s.textContent=l?(l.from===me.phone?"Toi : ":"")+(l.img?"Photo":l.aud?"Message vocal":l.t):"Nouvelle discussion";t.appendChild(b);t.appendChild(s);
+  var m=document.createElement("div");m.className="m";m.textContent=l?hm(l.ts):"";
+  if(h){m.appendChild(document.createElement("br"));var g=document.createElement("span");g.className="bd";g.textContent=h;m.appendChild(g)}
+  d.appendChild(a);d.appendChild(t);d.appendChild(m);d.onclick=function(){openChat(p)};L.appendChild(d)});
+ $("nolist").textContent=!synced?"Connexion…":ps.length?"":"Personne d’autre n’est inscrit. Invite tes amis, ils apparaîtront ici.";
+ total()}
+function openChat(p){open=p;seen[p]=Date.now();sv(KN,seen);
+ $("cname").textContent=nm(p);av($("cav"),p);renderChat();show("chat");
+ var b=!!bl[p];$("bar").hidden=b;$("cnote").hidden=!b}
+function renderChat(){
+ var B=$("msgs");B.textContent="";var c=bl[open]?[]:conv(open);
+ if(!c.length){var e=document.createElement("div");e.className="empty";e.textContent="Aucun message. Écris le premier.";B.appendChild(e)}
+ c.forEach(function(m){var mine=m.from===me.phone,d=document.createElement("div");d.className="b"+(mine?" me":"");
+  if(m.img){var i=document.createElement("img");i.src=m.img;i.alt="Photo";d.appendChild(i)}
+  if(m.aud){var au=document.createElement("audio");au.controls=true;au.preload="metadata";au.src=m.aud;d.appendChild(au)}
+  if(m.t){var s=document.createElement("span");s.textContent=m.t;d.appendChild(s)}
+  var sm=document.createElement("small");sm.textContent=hm(m.ts);d.appendChild(sm);B.appendChild(d)});
+ B.scrollTop=B.scrollHeight;seen[open]=Date.now();sv(KN,seen)}
+function rerender(){if(!me)return;if(cur==="list")renderList();else if(cur==="chat"){$("cname").textContent=nm(open);renderChat();total()}else total()}
+function sync(){
+ if(!db||!me)return;
+ db.collection("users").onSnapshot(function(s){users={};s.docs.forEach(function(d){users[d.id]=d.data()});synced=true;rerender()},function(){});
+ db.collection("msgs").orderBy("ts","desc").limit(400).onSnapshot(function(s){
+  msgs=s.docs.map(function(d){var x=d.data();x.id=d.id;return x}).filter(function(m){return m.from===me.phone||m.to===me.phone}).reverse();rerender()},function(){})}
+function send(img){
+ if(bl[open])return;var t=img?"":$("msg").value.trim();if(!t&&!img)return;$("msg").value="";
+ var m={from:me.phone,to:open,t:t,ts:Date.now()};if(img)m.img=img;
+ db.collection("msgs").add(m).catch(function(){alert("Envoi impossible. Vérifie ta connexion Internet et réessaie.")})}
+function sendAud(u){if(bl[open])return;db.collection("msgs").add({from:me.phone,to:open,t:"",aud:u,ts:Date.now()}).catch(function(){alert("Envoi impossible. Vérifie ta connexion Internet et réessaie.")})}
+var rec=null,chunks=[],rt=null;
+$("micB").onclick=async function(){
+ var b=this;if(rec){rec.stop();return}
+ if(!navigator.mediaDevices||!window.MediaRecorder){alert("Ton navigateur ne gère pas l’enregistrement vocal.");return}
+ var st;try{st=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){alert("Autorise le micro pour envoyer un message vocal.");return}
+ try{rec=new MediaRecorder(st,{audioBitsPerSecond:16000})}catch(e){rec=new MediaRecorder(st)}
+ chunks=[];
+ rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};
+ rec.onstop=function(){clearInterval(rt);st.getTracks().forEach(function(t){t.stop()});var ty=rec.mimeType||"audio/webm";rec=null;b.textContent="Vocal";
+  var blob=new Blob(chunks,{type:ty}),fr=new FileReader();
+  fr.onload=function(){if(fr.result.length>200000){alert("Message trop long. Reste sous 40 secondes.");return}sendAud(fr.result)};fr.readAsDataURL(blob)};
+ rec.start();var t0=Date.now();b.textContent="Stop 0s";
+ rt=setInterval(function(){var s=Math.round((Date.now()-t0)/1000);b.textContent="Stop "+s+"s";if(rec&&s>=40)rec.stop()},500)};
+document.body.addEventListener("click",function(e){var g=e.target.getAttribute&&e.target.getAttribute("data-go");if(!g)return;
+ if(g==="list")renderList();if(g==="settings")$("sname").value=me.name;show(g)});
+$("num").oninput=function(){var v=this.value.replace(/\D/g,"").slice(0,10);this.value=v.replace(/(\d{2})(?=\d)/g,"$1 ")};
+$("toCode").onclick=function(){var v=$("num").value.replace(/\D/g,"");if(v.length!==10){alert("Entre ton numéro à 10 chiffres.");return}
+ digits=v;$("codeInfo").textContent="Code envoyé par SMS au +225 "+$("num").value+".";$("code").value="";$("verify").disabled=true;show("code");countdown(30)};
+function countdown(n){clearInterval(timer);var b=$("resend");b.disabled=true;b.textContent="Renvoyer le code dans "+n+" s";
+ timer=setInterval(function(){n--;if(n<=0){clearInterval(timer);b.disabled=false;b.textContent="Renvoyer le code"}else b.textContent="Renvoyer le code dans "+n+" s"},1000)}
+$("resend").onclick=function(){$("codeInfo").textContent="Nouveau code envoyé.";countdown(30)};
+$("code").oninput=function(){this.value=this.value.replace(/\D/g,"").slice(0,6);$("verify").disabled=this.value.length!==6};
+$("verify").onclick=function(){clearInterval(timer);$("pname").value=users[digits]&&users[digits].name||"";$("pav").textContent=$("pname").value.charAt(0).toUpperCase()||"?";show("profile")};
+$("pname").oninput=function(){$("pav").textContent=this.value.trim().charAt(0).toUpperCase()||"?"};
+$("saveP").onclick=function(){var n=$("pname").value.trim();if(!n){alert("Entre ton prénom.");return}
+ me={name:n,phone:digits};sv(KS,me);
+ db.doc("users/"+digits).set({name:n,phone:digits,ts:Date.now()}).then(function(){sync();renderList();show("list")}).catch(function(){alert("Inscription impossible. Vérifie ta connexion Internet et réessaie.")})};
+$("cname").onclick=function(){av($("kav"),open);$("kname").textContent=nm(open);$("knum").textContent=fmt(open);$("block").textContent=bl[open]?"Débloquer":"Bloquer";show("contact")};
+$("block").onclick=function(){if(bl[open])delete bl[open];else if(confirm("Bloquer ce contact ? Tu ne verras plus ses messages."))bl[open]=1;sv(KB,bl);openChat(open)};
+$("report").onclick=function(){if(confirm("Signaler ce contact à l’équipe Ivo Chat ?"))alert("Merci. Ton signalement a été enregistré.")};
+$("send").onclick=function(){send()};
+$("msg").onkeydown=function(e){if(e.key==="Enter")send()};
+$("photoB").onclick=function(){$("file").click()};
+$("file").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();
+ rd.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(480,im.width),q=.55,cv=document.createElement("canvas");cv.width=w;cv.height=Math.round(im.height*w/im.width);cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);
+  var u=cv.toDataURL("image/jpeg",q);while(u.length>150000&&q>.2){q-=.1;u=cv.toDataURL("image/jpeg",q)}send(u)};im.src=rd.result};rd.readAsDataURL(f);this.value=""};
+$("saveS").onclick=function(){var n=$("sname").value.trim();if(!n)return;me.name=n;sv(KS,me);db.doc("users/"+me.phone).update({name:n}).then(function(){alert("Prénom enregistré.")}).catch(function(){})};
+$("del").onclick=function(){if(confirm("Supprimer ton compte ?")){var p=me.phone;db.doc("users/"+p).delete().catch(function(){});me=null;msgs=[];try{localStorage.removeItem(KS)}catch(e){}$("num").value="";show("welcome")}};
+show("welcome");$("start").onclick=function(){if(!db){$("dbwarn").hidden=false;$("dbwarn").textContent="Base de données non configurée. Vérifie la configuration Firebase.";return}show("phone")};
+(function(){
+ try{
+  if(String(FIREBASE_CONFIG.apiKey).indexOf("COLLE")===0)throw new Error("config");
+  firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore();
+ }catch(e){db=null}
+ if(!db){$("dbwarn").hidden=false;$("dbwarn").textContent="Base de données non configurée : colle d’abord la configuration Firebase dans le fichier.";return}
+ if(me){sync();renderList();show("list")}
+})();
+})();
+</script>
+</body>
+</html>
