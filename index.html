@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -50,11 +49,14 @@ button:disabled{opacity:.45}
 .b small{display:block;text-align:right;font-size:11px;opacity:.7;margin-top:2px}
 .b img{max-width:100%;border-radius:10px;display:block}
 .bar{display:flex;gap:8px;align-items:center;padding-top:8px}
-.bar input{border-radius:99px}.bar button{border-radius:99px;padding:12px 16px}
+.bar input{flex:1;min-width:0;border-radius:99px}.bar button{border-radius:99px;padding:12px 16px}.bar button.ic{width:44px;height:44px;padding:0;display:grid;place-items:center;flex:none}.bar button.rec{width:auto;padding:0 16px;background:#c0391b!important;color:#fff!important}
 .b audio{width:230px;max-width:100%;display:block}
 #start{width:100%;font-size:18px;padding:16px}
 .note{text-align:center;color:var(--mute);font-size:14px;padding:8px}
 .empty{color:var(--mute);text-align:center;margin-top:40px}
+.b{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.b.del{font-style:italic;opacity:.75}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+#sheet .pn{width:100%;max-width:520px;background:var(--card);border-radius:18px 18px 0 0;padding:14px 18px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 </style>
 </head>
 <body>
@@ -108,7 +110,7 @@ button:disabled{opacity:.45}
 <div class="top"><button class="sec" data-go="list">Retour</button><div class="av" id="cav" style="width:38px;height:38px"></div><b class="grow" id="cname" style="cursor:pointer"></b></div>
 <div class="msgs" id="msgs"></div>
 <div class="note" id="cnote" hidden>Tu as bloqué ce contact.</div>
-<div class="bar" id="bar"><button class="sec" id="photoB" aria-label="Envoyer une photo" style="padding:10px">Photo</button><button class="sec" id="micB" aria-label="Message vocal" style="padding:10px">Vocal</button><input id="msg" placeholder="Écris un message" maxlength="1000" autocomplete="off"><button class="pri" id="send">Envoyer</button></div>
+<div class="bar" id="bar"><button class="sec ic" id="photoB" aria-label="Envoyer une photo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 9"/></svg></button><input id="msg" placeholder="Écris un message" maxlength="1000" autocomplete="off"><button class="pri ic" id="micB" aria-label="Message vocal"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/></svg></button><button class="pri ic" id="send" aria-label="Envoyer" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg></button></div>
 <input type="file" id="file" accept="image/*" hidden>
 </section>
 
@@ -130,6 +132,7 @@ button:disabled{opacity:.45}
 <button class="danger" id="del">Supprimer mon compte</button>
 </section>
 
+<div id="sheet" hidden><div class="pn"><button class="danger" id="delAll">Supprimer pour tout le monde</button><button class="danger" id="delMe">Supprimer pour moi</button><button class="sec" id="delCancel" style="width:100%;margin-top:6px">Annuler</button></div></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -146,12 +149,12 @@ var FIREBASE_CONFIG={
 </script>
 <script>
 (function(){
-var KS="ivochat-session",KB="ivochat-blocked",KN="ivochat-seen";
+var KS="ivochat-session",KB="ivochat-blocked",KN="ivochat-seen",KH="ivochat-hidden";
 var VOC_MAX=180,VOC_CHARS=950000;
-var me=null,bl={},seen={},users={},msgs=[],db=null,cur="welcome",open=null,timer=null,digits="",synced=false,pphoto="";
+var hid={},me=null,bl={},seen={},users={},msgs=[],db=null,cur="welcome",open=null,timer=null,digits="",synced=false,pphoto="";
 function ld(k,d){try{var r=localStorage.getItem(k);return r?JSON.parse(r):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-me=ld(KS,null);bl=ld(KB,{});seen=ld(KN,{});
+me=ld(KS,null);bl=ld(KB,{});seen=ld(KN,{});hid=ld(KH,{});
 function $(i){return document.getElementById(i)}
 function hm(t){return new Date(t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}
 function fmt(p){return "+225 "+String(p).replace(/(\d{2})(?=\d)/g,"$1 ")}
@@ -162,7 +165,7 @@ function av(el,p){var u=users[p],ph=u&&u.photo;el.style.background=col(p);el.tex
 function pic(f,cb){var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=160;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);cb(c.toDataURL("image/jpeg",.7))};im.src=rd.result};rd.readAsDataURL(f)}
 function setPav(){var a=$("pav");if(pphoto){a.textContent="";a.style.background="url('"+pphoto+"') center/cover";$("pphotoB").textContent="Changer la photo"}else{a.style.background="var(--g)";a.textContent=$("pname").value.trim().charAt(0).toUpperCase()||"?";$("pphotoB").textContent="Ajouter une photo"}}
 function show(id){document.querySelectorAll(".scr").forEach(function(e){e.hidden=e.id!=="s-"+id});cur=id}
-function conv(p){return msgs.filter(function(m){return m.from===p||m.to===p})}
+function conv(p){return msgs.filter(function(m){return (m.from===p||m.to===p)&&!hid[m.id]})}
 function unread(p){if(bl[p])return 0;return msgs.filter(function(m){return m.from===p&&m.ts>(seen[p]||0)}).length}
 function total(){var n=0;Object.keys(users).forEach(function(p){if(p!==me.phone)n+=unread(p)});document.title=n?"("+n+") Ivo Chat":"Ivo Chat"}
 function renderList(){
@@ -173,7 +176,7 @@ function renderList(){
  ps.forEach(function(p){var l=last(p),h=unread(p);
   var d=document.createElement("div");d.className="it";
   var a=document.createElement("div");a.className="av";av(a,p);
-  var t=document.createElement("div");t.className="t";var b=document.createElement("b");b.textContent=nm(p);var s=document.createElement("span");s.textContent=l?(l.from===me.phone?"Toi : ":"")+(l.img?"Photo":l.aud?"Message vocal":l.t):"Nouvelle discussion";t.appendChild(b);t.appendChild(s);
+  var t=document.createElement("div");t.className="t";var b=document.createElement("b");b.textContent=nm(p);var s=document.createElement("span");s.textContent=l?(l.from===me.phone?"Toi : ":"")+(l.del?"Message supprimé":l.img?"Photo":l.aud?"Message vocal":l.t):"Nouvelle discussion";t.appendChild(b);t.appendChild(s);
   var m=document.createElement("div");m.className="m";m.textContent=l?hm(l.ts):"";
   if(h){m.appendChild(document.createElement("br"));var g=document.createElement("span");g.className="bd";g.textContent=h;m.appendChild(g)}
   d.appendChild(a);d.appendChild(t);d.appendChild(m);d.onclick=function(){openChat(p)};L.appendChild(d)});
@@ -181,15 +184,26 @@ function renderList(){
  total()}
 function openChat(p){open=p;seen[p]=Date.now();sv(KN,seen);
  $("cname").textContent=nm(p);av($("cav"),p);renderChat();show("chat");
- var b=!!bl[p];$("bar").hidden=b;$("cnote").hidden=!b}
+ var b=!!bl[p];$("bar").hidden=b;$("cnote").hidden=!b;bt()}
+function menu(m){
+ var sh=$("sheet");$("delAll").hidden=!(m.from===me.phone&&!m.del);sh.hidden=false;
+ sh.onclick=function(e){if(e.target===sh)sh.hidden=true};
+ $("delCancel").onclick=function(){sh.hidden=true};
+ $("delMe").onclick=function(){hid[m.id]=1;sv(KH,hid);sh.hidden=true;rerender()};
+ $("delAll").onclick=function(){sh.hidden=true;var F=firebase.firestore.FieldValue;db.collection("msgs").doc(m.id).update({del:true,t:"",img:F.delete(),aud:F.delete()}).catch(function(){alert("Suppression impossible. Vérifie ta connexion Internet et réessaie.")})}}
+function lp(d,m){var t=null;function c(){clearTimeout(t)}
+ d.addEventListener("touchstart",function(){t=setTimeout(function(){menu(m)},500)},{passive:true});
+ d.addEventListener("touchend",c);d.addEventListener("touchmove",c);d.addEventListener("touchcancel",c);
+ d.addEventListener("contextmenu",function(e){e.preventDefault();menu(m)})}
 function renderChat(){
  var B=$("msgs");B.textContent="";var c=bl[open]?[]:conv(open);
  if(!c.length){var e=document.createElement("div");e.className="empty";e.textContent="Aucun message. Écris le premier.";B.appendChild(e)}
- c.forEach(function(m){var mine=m.from===me.phone,d=document.createElement("div");d.className="b"+(mine?" me":"");
+ c.forEach(function(m){var mine=m.from===me.phone,d=document.createElement("div");d.className="b"+(mine?" me":"")+(m.del?" del":"");
+  if(m.del){var x=document.createElement("span");x.textContent=mine?"Tu as supprimé ce message":"Ce message a été supprimé";d.appendChild(x)}else{
   if(m.img){var i=document.createElement("img");i.src=m.img;i.alt="Photo";d.appendChild(i)}
   if(m.aud){var au=document.createElement("audio");au.controls=true;au.preload="metadata";au.src=m.aud;d.appendChild(au)}
-  if(m.t){var s=document.createElement("span");s.textContent=m.t;d.appendChild(s)}
-  var sm=document.createElement("small");sm.textContent=hm(m.ts);d.appendChild(sm);B.appendChild(d)});
+  if(m.t){var s=document.createElement("span");s.textContent=m.t;d.appendChild(s)}}
+  var sm=document.createElement("small");sm.textContent=hm(m.ts);d.appendChild(sm);lp(d,m);B.appendChild(d)});
  B.scrollTop=B.scrollHeight;seen[open]=Date.now();sv(KN,seen)}
 function rerender(){if(!me)return;if(cur==="list")renderList();else if(cur==="chat"){$("cname").textContent=nm(open);av($("cav"),open);renderChat();total()}else total()}
 function sync(){
@@ -197,12 +211,13 @@ function sync(){
  db.collection("users").onSnapshot(function(s){users={};s.docs.forEach(function(d){users[d.id]=d.data()});synced=true;rerender()},function(){});
  db.collection("msgs").orderBy("ts","desc").limit(400).onSnapshot(function(s){
   msgs=s.docs.map(function(d){var x=d.data();x.id=d.id;return x}).filter(function(m){return m.from===me.phone||m.to===me.phone}).reverse();rerender()},function(){})}
+function bt(){var h=$("msg").value.trim().length>0;$("send").hidden=!h;$("micB").hidden=h}
 function send(img){
- if(bl[open])return;var t=img?"":$("msg").value.trim();if(!t&&!img)return;$("msg").value="";
+ if(bl[open])return;var t=img?"":$("msg").value.trim();if(!t&&!img)return;$("msg").value="";bt();
  var m={from:me.phone,to:open,t:t,ts:Date.now()};if(img)m.img=img;
  db.collection("msgs").add(m).catch(function(){alert("Envoi impossible. Vérifie ta connexion Internet et réessaie.")})}
 function sendAud(u){if(bl[open])return;db.collection("msgs").add({from:me.phone,to:open,t:"",aud:u,ts:Date.now()}).catch(function(){alert("Envoi impossible. Le message vocal est peut-être trop lourd, ou ta connexion est coupée. Réessaie.")})}
-var rec=null,chunks=[],rt=null;
+var rec=null,chunks=[],rt=null,MIC=$("micB").innerHTML;
 function tm(s){return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2)}
 $("micB").onclick=async function(){
  var b=this;if(rec){rec.stop();return}
@@ -211,11 +226,11 @@ $("micB").onclick=async function(){
  try{rec=new MediaRecorder(st,{audioBitsPerSecond:16000})}catch(e){rec=new MediaRecorder(st)}
  chunks=[];
  rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};
- rec.onstop=function(){clearInterval(rt);st.getTracks().forEach(function(t){t.stop()});var ty=rec.mimeType||"audio/webm";rec=null;b.textContent="Vocal";
+ rec.onstop=function(){clearInterval(rt);st.getTracks().forEach(function(t){t.stop()});var ty=rec.mimeType||"audio/webm";rec=null;b.classList.remove("rec");b.innerHTML=MIC;
   var blob=new Blob(chunks,{type:ty}),fr=new FileReader();
   fr.onload=function(){if(fr.result.length>VOC_CHARS){alert("Message trop long pour la version d’essai. Fais un vocal plus court.");return}sendAud(fr.result)};fr.readAsDataURL(blob)};
- rec.start();var t0=Date.now();b.textContent="Stop 0:00";
- rt=setInterval(function(){var s=Math.round((Date.now()-t0)/1000);b.textContent="Stop "+tm(s);if(rec&&s>=VOC_MAX)rec.stop()},500)};
+ rec.start();var t0=Date.now();b.classList.add("rec");b.textContent="■ 0:00";
+ rt=setInterval(function(){var s=Math.round((Date.now()-t0)/1000);b.textContent="■ "+tm(s);if(rec&&s>=VOC_MAX)rec.stop()},500)};
 document.body.addEventListener("click",function(e){var g=e.target.getAttribute&&e.target.getAttribute("data-go");if(!g)return;
  if(g==="list")renderList();if(g==="settings")$("sname").value=me.name;show(g)});
 $("num").oninput=function(){var v=this.value.replace(/\D/g,"").slice(0,10);this.value=v.replace(/(\d{2})(?=\d)/g,"$1 ")};
@@ -238,6 +253,7 @@ $("block").onclick=function(){if(bl[open])delete bl[open];else if(confirm("Bloqu
 $("report").onclick=function(){if(confirm("Signaler ce contact à l’équipe Ivo Chat ?"))alert("Merci. Ton signalement a été enregistré.")};
 $("send").onclick=function(){send()};
 $("msg").onkeydown=function(e){if(e.key==="Enter")send()};
+$("msg").oninput=bt;
 $("photoB").onclick=function(){$("file").click()};
 $("file").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();
  rd.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(480,im.width),q=.55,cv=document.createElement("canvas");cv.width=w;cv.height=Math.round(im.height*w/im.width);cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);
